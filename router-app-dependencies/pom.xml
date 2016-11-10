@@ -3,6 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>router-app-dependencies</artifactId>
+    <version>1.1.0.BUILD-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>router-app-dependencies</name>
     <description>Spring Cloud Stream Router App Dependencies</description>
