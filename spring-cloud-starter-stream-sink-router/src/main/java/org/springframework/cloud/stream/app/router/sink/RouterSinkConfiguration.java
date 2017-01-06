@@ -23,6 +23,7 @@ import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.binding.BinderAwareChannelResolver;
 import org.springframework.cloud.stream.messaging.Sink;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.groovy.GroovyScriptExecutingMessageProcessor;
 import org.springframework.integration.router.AbstractMappingMessageRouter;
@@ -34,10 +35,13 @@ import org.springframework.scripting.ScriptSource;
 
 /**
  * A sink app that routes to one or more named channels.
+ *
  * @author Gary Russell
+ * @author Artem Bilan
  */
 @EnableBinding(Sink.class)
 @EnableConfigurationProperties(RouterSinkProperties.class)
+@Import(ScriptVariableGeneratorConfiguration.class)
 public class RouterSinkConfiguration {
 
 	@Autowired

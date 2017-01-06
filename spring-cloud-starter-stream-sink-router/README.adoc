@@ -1,7 +1,7 @@
 //tag::ref-doc[]
 = Router Sink
 
-This module routes messages to named channels.
+This application routes messages to named channels.
 
 == Options
 

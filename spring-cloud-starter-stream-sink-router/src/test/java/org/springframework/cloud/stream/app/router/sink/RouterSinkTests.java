@@ -26,30 +26,31 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.test.IntegrationTest;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.WebIntegrationTest;
+import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.stream.binder.BinderFactory;
 import org.springframework.cloud.stream.messaging.Sink;
 import org.springframework.cloud.stream.test.binder.MessageCollector;
 import org.springframework.cloud.stream.test.binder.TestSupportBinder;
+import org.springframework.context.annotation.Import;
 import org.springframework.integration.router.AbstractMappingMessageRouter;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * Tests for RouterSinkConfiguration.
  *
  * @author Gary Russell
+ * @author Artem Bilan
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = RouterSinkTests.RouterSinkApplication.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @DirtiesContext
-@WebIntegrationTest(randomPort = true)
 public abstract class RouterSinkTests {
 
 	@Autowired
@@ -64,7 +65,7 @@ public abstract class RouterSinkTests {
 	@Autowired
 	protected AbstractMappingMessageRouter router;
 
-	@IntegrationTest({ "router.resolutionRequired = true" })
+	@TestPropertySource(properties = "router.resolutionRequired = true")
 	public static class DefaultRouterTests extends RouterSinkTests {
 
 		@Test
@@ -85,7 +86,9 @@ public abstract class RouterSinkTests {
 
 	}
 
-	@IntegrationTest({ "router.expression = headers['route']", "router.resolutionRequired = true" })
+	@TestPropertySource(properties = {
+			"router.expression = headers['route']",
+			"router.resolutionRequired = true" })
 	public static class DefaultRouterWithExpressionTests extends RouterSinkTests {
 
 		@Test
@@ -106,7 +109,9 @@ public abstract class RouterSinkTests {
 
 	}
 
-	@IntegrationTest({ "router.expression = headers['route']", "router.destinationMappings = foo=baz \\n bar=qux",
+	@TestPropertySource(properties = {
+			"router.expression = headers['route']",
+			"router.destinationMappings = foo=baz \\n bar=qux",
 			"router.resolutionRequired = true" })
 	public static class WithChannelMappingsTests extends RouterSinkTests {
 
@@ -128,8 +133,10 @@ public abstract class RouterSinkTests {
 
 	}
 
-	@IntegrationTest({ "router.expression = headers['route']", "router.defaultOutputChannel = discards",
-		"spring.cloud.stream.dynamicDestinations = foo,bar,discards" })
+	@TestPropertySource(properties = {
+			"router.expression = headers['route']",
+			"router.defaultOutputChannel = discards",
+			"spring.cloud.stream.dynamicDestinations = foo,bar,discards" })
 	public static class WithDiscardChannelTests extends RouterSinkTests {
 
 		@Test
@@ -156,8 +163,10 @@ public abstract class RouterSinkTests {
 
 	}
 
-	@IntegrationTest({ "router.script = classpath:/routertest.groovy", "router.variables = foo=baz",
-		"router.variablesLocation = classpath:/routertest.properties" })
+	@TestPropertySource(properties = {
+			"router.script = classpath:/routertest.groovy",
+			"router.variables = foo=baz",
+			"router.variablesLocation = classpath:/routertest.properties" })
 	public static class WithGroovyTests extends RouterSinkTests {
 
 		@Test
@@ -178,7 +187,10 @@ public abstract class RouterSinkTests {
 
 	}
 
-	@SpringBootApplication
+	// Avoid @SpringBootApplication with its @ComponentScan
+	@SpringBootConfiguration
+	@EnableAutoConfiguration
+	@Import(RouterSinkConfiguration.class)
 	public static class RouterSinkApplication {
 
 	}
