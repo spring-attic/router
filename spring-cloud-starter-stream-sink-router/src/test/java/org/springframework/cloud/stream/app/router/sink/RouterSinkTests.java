@@ -16,12 +16,6 @@
 
 package org.springframework.cloud.stream.app.router.sink;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.springframework.cloud.stream.test.matcher.MessageQueueMatcher.receivesPayloadThat;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -42,6 +36,12 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.springframework.cloud.stream.test.matcher.MessageQueueMatcher.receivesPayloadThat;
+
 /**
  * Tests for RouterSinkConfiguration.
  *
@@ -60,7 +60,7 @@ public abstract class RouterSinkTests {
 	protected MessageCollector collector;
 
 	@Autowired
-	protected BinderFactory<MessageChannel> binderFactory;
+	protected BinderFactory binderFactory;
 
 	@Autowired
 	protected AbstractMappingMessageRouter router;
@@ -70,7 +70,7 @@ public abstract class RouterSinkTests {
 
 		@Test
 		public void test() throws Exception {
-			TestSupportBinder binder = (TestSupportBinder) this.binderFactory.getBinder(null);
+			TestSupportBinder binder = (TestSupportBinder) this.binderFactory.getBinder(null, MessageChannel.class);
 			Message<?> message = MessageBuilder.withPayload("hello").setHeader("routeTo", "baz").build();
 			this.channels.input().send(message);
 			MessageChannel baz = binder.getChannelForName("baz");
@@ -93,7 +93,7 @@ public abstract class RouterSinkTests {
 
 		@Test
 		public void test() throws Exception {
-			TestSupportBinder binder = (TestSupportBinder) this.binderFactory.getBinder(null);
+			TestSupportBinder binder = (TestSupportBinder) this.binderFactory.getBinder(null, MessageChannel.class);
 			Message<?> message = MessageBuilder.withPayload("hello").setHeader("route", "baz").build();
 			this.channels.input().send(message);
 			MessageChannel baz = binder.getChannelForName("baz");
@@ -117,7 +117,7 @@ public abstract class RouterSinkTests {
 
 		@Test
 		public void test() throws Exception {
-			TestSupportBinder binder = (TestSupportBinder) this.binderFactory.getBinder(null);
+			TestSupportBinder binder = (TestSupportBinder) this.binderFactory.getBinder(null, MessageChannel.class);
 			Message<?> message = MessageBuilder.withPayload("hello").setHeader("route", "foo").build();
 			this.channels.input().send(message);
 			MessageChannel baz = binder.getChannelForName("baz");
@@ -141,7 +141,7 @@ public abstract class RouterSinkTests {
 
 		@Test
 		public void test() throws Exception {
-			TestSupportBinder binder = (TestSupportBinder) this.binderFactory.getBinder(null);
+			TestSupportBinder binder = (TestSupportBinder) this.binderFactory.getBinder(null, MessageChannel.class);
 			Message<?> message = MessageBuilder.withPayload("hello").setHeader("route", "foo").build();
 			this.channels.input().send(message);
 			message = MessageBuilder.withPayload("hello").setHeader("route", "bar").build();
@@ -171,7 +171,7 @@ public abstract class RouterSinkTests {
 
 		@Test
 		public void test() throws Exception {
-			TestSupportBinder binder = (TestSupportBinder) this.binderFactory.getBinder(null);
+			TestSupportBinder binder = (TestSupportBinder) this.binderFactory.getBinder(null, MessageChannel.class);
 			Message<?> message = MessageBuilder.withPayload("hello").setHeader("route", "foo").build();
 			this.channels.input().send(message);
 			MessageChannel baz = binder.getChannelForName("baz");
