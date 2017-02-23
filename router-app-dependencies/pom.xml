@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.springframework.cloud.stream.app</groupId>
     <artifactId>router-app-dependencies</artifactId>
-    <version>1.1.2.M1</version>
+    <version>1.1.2.BUILD-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>router-app-dependencies</name>
     <description>Spring Cloud Stream Router App Dependencies</description>
@@ -20,7 +20,7 @@
             <dependency>
                 <groupId>org.springframework.cloud.stream.app</groupId>
                 <artifactId>spring-cloud-starter-stream-sink-router</artifactId>
-                <version>1.1.2.M1</version>
+                <version>1.1.2.BUILD-SNAPSHOT</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
