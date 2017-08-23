@@ -3,6 +3,20 @@
 
 This application routes messages to named channels.
 
+== Input
+
+=== Headers
+
+=== Payload
+
+Any
+
+== Output
+
+N/A
+
+== Options
+
 == Options
 
 The **$$router$$** $$sink$$ has the following options:
@@ -70,7 +84,20 @@ http://docs.spring.io/spring-integration/reference/html/messaging-endpoints-chap
 == Build
 
 ```
-$ mvn clean package
+$ ./mvnw clean install -PgenerateApps
+$ cd apps
+```
+You can find the corresponding binder based projects here.
+You can then cd into one one of the folders and build it:
+```
+$ ./mvnw clean package
+```
+
+== Examples
+
+```
+java -jar router-sink.jar --expression=" "
+java -jar router-sink.jar --script=" "
 ```
 
 
