@@ -79,8 +79,6 @@ Note that _payload_ and _headers_ are implicitly bound to give you access to the
 For more information, see the Spring Integration Reference manual
 http://docs.spring.io/spring-integration/reference/html/messaging-endpoints-chapter.html#groovy[Groovy Support].
 
-//end::ref-doc[]
-
 == Build
 
 ```
@@ -99,5 +97,7 @@ $ ./mvnw clean package
 java -jar router-sink.jar --expression=" "
 java -jar router-sink.jar --script=" "
 ```
+
+//end::ref-doc[]
 
 
