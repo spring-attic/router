@@ -18,23 +18,20 @@ package org.springframework.cloud.stream.app.router.sink;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringBootConfiguration;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.stream.binder.BinderFactory;
 import org.springframework.cloud.stream.messaging.Sink;
 import org.springframework.cloud.stream.test.binder.MessageCollector;
 import org.springframework.cloud.stream.test.binder.TestSupportBinder;
-import org.springframework.context.annotation.Import;
 import org.springframework.integration.router.AbstractMappingMessageRouter;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotNull;
@@ -48,7 +45,7 @@ import static org.springframework.cloud.stream.test.matcher.MessageQueueMatcher.
  * @author Gary Russell
  * @author Artem Bilan
  */
-@RunWith(SpringRunner.class)
+@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @DirtiesContext
 public abstract class RouterSinkTests {
@@ -188,9 +185,7 @@ public abstract class RouterSinkTests {
 	}
 
 	// Avoid @SpringBootApplication with its @ComponentScan
-	@SpringBootConfiguration
-	@EnableAutoConfiguration
-	@Import(RouterSinkConfiguration.class)
+	@SpringBootApplication
 	public static class RouterSinkApplication {
 
 	}

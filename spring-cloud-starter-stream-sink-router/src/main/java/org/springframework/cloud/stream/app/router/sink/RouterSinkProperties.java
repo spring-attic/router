@@ -15,17 +15,16 @@
  */
 package org.springframework.cloud.stream.app.router.sink;
 
-import java.util.Properties;
-
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.NotNull;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.Resource;
 import org.springframework.expression.Expression;
-import org.springframework.integration.dsl.support.Function;
-import org.springframework.integration.dsl.support.FunctionExpression;
+import org.springframework.integration.expression.FunctionExpression;
 import org.springframework.messaging.Message;
+
+import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.NotNull;
+import java.util.Properties;
+import java.util.function.Function;
 
 /**
  * Properties for the Router Sink; the router can use an expression
@@ -38,14 +37,7 @@ import org.springframework.messaging.Message;
 @ConfigurationProperties("router")
 public class RouterSinkProperties {
 
-	public static final Expression DEFAULT_EXPRESSION = new FunctionExpression<>(new Function<Message<?>, Object>() {
-
-		@Override
-		public Object apply(Message<?> message) {
-			return message.getHeaders().get("routeTo");
-		}
-
-	});
+	public static final Expression DEFAULT_EXPRESSION = new FunctionExpression<>((Function<Message<?>, Object>) message -> message.getHeaders().get("routeTo"));
 
 	/**
 	 * Variable bindings as a new line delimited string of name-value pairs, e.g. 'foo=bar\n baz=car'.
