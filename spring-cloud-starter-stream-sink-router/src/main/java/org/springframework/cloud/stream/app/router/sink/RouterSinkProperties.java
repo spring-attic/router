@@ -51,7 +51,8 @@ public class RouterSinkProperties {
 
 	/**
 	 * The expression to be applied to the message to determine the channel(s)
-	 * to route to.
+	 * to route to. When text/json 'payload' is used in the expression you should convert it into string first:
+	 * 'new String(payload)'
 	 */
 	private Expression expression = DEFAULT_EXPRESSION;
 
