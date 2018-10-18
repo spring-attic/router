@@ -51,6 +51,24 @@ For more information, please see the "Routers and the Spring Expression Language
 Integration Reference manual
 http://docs.spring.io/spring-integration/reference/html/messaging-routing-chapter.html#router-namespace[Configuring (Generic) Router section].
 
+NOTE: Starting with SCSt (Spring Cloud Stream) 2.0 the message wire format for `json`, `text` and `xml` content types is `byte[]` not String.
+The SpEL expressions for those content-types will either need to convert the payload to `String` or use the `jsonPath`
+or `xmlPath` utils that handle byte array payloads.
+
+For example for text content type one should use:
+
+[source]
+----
+ new String(payload).contains('a')
+----
+
+and for `json` content type SpEL expressions like this:
+
+[source]
+----
+ #jsonPath(payload, '$.person.name')
+----
+
 == Groovy-based Routing
 
 Instead of SpEL expressions, Groovy scripts can also be used. Let's create a Groovy script in the file system at
