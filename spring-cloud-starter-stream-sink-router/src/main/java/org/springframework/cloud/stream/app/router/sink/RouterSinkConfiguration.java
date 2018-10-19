@@ -16,7 +16,6 @@
 
 package org.springframework.cloud.stream.app.router.sink;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.stream.annotation.EnableBinding;
@@ -28,6 +27,7 @@ import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.groovy.GroovyScriptExecutingMessageProcessor;
 import org.springframework.integration.router.AbstractMappingMessageRouter;
 import org.springframework.integration.router.ExpressionEvaluatingRouter;
+import org.springframework.integration.router.MessageRouter;
 import org.springframework.integration.router.MethodInvokingRouter;
 import org.springframework.integration.scripting.RefreshableResourceScriptSource;
 import org.springframework.integration.scripting.ScriptVariableGenerator;
@@ -38,18 +38,16 @@ import org.springframework.scripting.ScriptSource;
  *
  * @author Gary Russell
  * @author Artem Bilan
+ * @author Christian Tzolov
  */
 @EnableBinding(Sink.class)
 @EnableConfigurationProperties(RouterSinkProperties.class)
 @Import(ScriptVariableGeneratorConfiguration.class)
 public class RouterSinkConfiguration {
 
-	@Autowired
-	Sink channels;
-
 	@Bean
 	@ServiceActivator(inputChannel = Sink.INPUT)
-	public AbstractMappingMessageRouter router(BinderAwareChannelResolver channelResolver,
+	public MessageRouter router(BinderAwareChannelResolver channelResolver,
 			ScriptVariableGenerator scriptVariableGenerator, RouterSinkProperties properties) {
 		AbstractMappingMessageRouter router;
 		if (properties.getScript() != null) {

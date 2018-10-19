@@ -50,8 +50,9 @@ public class RouterSinkProperties {
 	private Resource variablesLocation;
 
 	/**
-	 * The expression to be applied to the message to determine the channel(s)
-	 * to route to.
+	 * The expression to be applied to the message to determine the channel(s) to route to.
+	 * Note that the payload wire format for content types such as text, json or xml is byte[] not String!.
+	 * Consult the documentation for how to handle byte array payload content.
 	 */
 	private Expression expression = DEFAULT_EXPRESSION;
 

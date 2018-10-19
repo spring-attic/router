@@ -24,12 +24,10 @@ The **$$router$$** $$sink$$ has the following options:
 //tag::configuration-properties[]
 $$router.default-output-channel$$:: $$Where to send unroutable messages.$$ *($$String$$, default: `$$nullChannel$$`)*
 $$router.destination-mappings$$:: $$Destination mappings as a new line delimited string of name-value pairs, e.g. 'foo=bar\n baz=car'.$$ *($$Properties$$, default: `$$<none>$$`)*
-$$router.expression$$:: $$The expression to be applied to the message to determine the channel(s)
- to route to.$$ *($$Expression$$, default: `$$<none>$$`)*
+$$router.expression$$:: $$The expression to be applied to the message to determine the channel(s) to route to. Note that the payload wire format for content types such as text, json or xml is byte[] not String!. Consult the documentation for how to handle byte array payload content.$$ *($$Expression$$, default: `$$<none>$$`)*
 $$router.refresh-delay$$:: $$How often to check for script changes in ms (if present); < 0 means don't refresh.$$ *($$Integer$$, default: `$$60000$$`)*
 $$router.resolution-required$$:: $$Whether or not channel resolution is required.$$ *($$Boolean$$, default: `$$false$$`)*
-$$router.script$$:: $$The location of a groovy script that returns channels or channel mapping
- resolution keys.$$ *($$Resource$$, default: `$$<none>$$`)*
+$$router.script$$:: $$The location of a groovy script that returns channels or channel mapping resolution keys.$$ *($$Resource$$, default: `$$<none>$$`)*
 $$router.variables$$:: $$Variable bindings as a new line delimited string of name-value pairs, e.g. 'foo=bar\n baz=car'.$$ *($$Properties$$, default: `$$<none>$$`)*
 $$router.variables-location$$:: $$The location of a properties file containing custom script variable bindings.$$ *($$Resource$$, default: `$$<none>$$`)*
 //end::configuration-properties[]
@@ -52,6 +50,28 @@ The expression evaluates against the message and returns either a channel name, 
 For more information, please see the "Routers and the Spring Expression Language (SpEL)" subsection in the Spring
 Integration Reference manual
 http://docs.spring.io/spring-integration/reference/html/messaging-routing-chapter.html#router-namespace[Configuring (Generic) Router section].
+
+NOTE: Starting with Spring Cloud Stream 2.0 onwards the message wire format for `json`, `text` and `xml` content types is `byte[]` not `String`!
+This is an altering change from SCSt 1.x that treats those types as Strings!
+Depends on the content type, different techniques for handling the `byte[]` payloads are available. For plain `text`
+content types, one can covert the octet payload into string using the `new String(payload)` SpEL expression. For `json`
+types the https://docs.spring.io/spring-integration/reference/html/spel.html#spel-functions[jsonPath()] SpEL utility
+already supports string and byte array content interchangeably. Same applies for the `xml` content type and the
+https://docs.spring.io/spring-integration/reference/html/xml.html#xpath-spel-function[#xpath()] SpEL utility.
+
+For example for `text` content type one should use:
+
+[source]
+----
+ new String(payload).contains('a')
+----
+
+and for `json` content type SpEL expressions like this:
+
+[source]
+----
+ #jsonPath(payload, '$.person.name')
+----
 
 == Groovy-based Routing
 
@@ -94,7 +114,7 @@ $ ./mvnw clean package
 == Examples
 
 ```
-java -jar router-sink.jar --expression=" "
+java -jar router-sink.jar --expression="new String(payload).contains('a')?':foo':':bar'"
 java -jar router-sink.jar --script=" "
 ```
 
