@@ -15,12 +15,21 @@
         <relativePath />
     </parent>
 
+    <properties>
+        <apache-ivy.version>2.4.0</apache-ivy.version>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>org.springframework.cloud.stream.app</groupId>
                 <artifactId>spring-cloud-starter-stream-sink-router</artifactId>
                 <version>2.1.0.BUILD-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ivy</groupId>
+                <artifactId>ivy</artifactId>
+                <version>${apache-ivy.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

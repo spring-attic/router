@@ -184,6 +184,30 @@ public abstract class RouterSinkTests {
 
 	}
 
+	@TestPropertySource(properties = {
+			"router.script = classpath:/routertest-with-grab.groovy",
+			"router.variables = foo=baz",
+			"router.variablesLocation = classpath:/routertest.properties" })
+	public static class WithGroovyAndGrabTests extends RouterSinkTests {
+
+		@Test
+		public void test() throws Exception {
+			TestSupportBinder binder = (TestSupportBinder) this.binderFactory.getBinder(null, MessageChannel.class);
+			Message<?> message = MessageBuilder.withPayload("hello").setHeader("route", "foo").build();
+			this.channels.input().send(message);
+			MessageChannel baz = binder.getChannelForName("baz");
+			assertNotNull(baz);
+			assertThat(collector.forChannel(baz), receivesPayloadThat(is("hello")));
+
+			message = MessageBuilder.withPayload("world").setHeader("route", "bar").build();
+			this.channels.input().send(message);
+			MessageChannel qux = binder.getChannelForName("qux");
+			assertNotNull(qux);
+			assertThat(collector.forChannel(qux), receivesPayloadThat(is("world")));
+		}
+
+	}
+
 	// Avoid @SpringBootApplication with its @ComponentScan
 	@SpringBootApplication
 	public static class RouterSinkApplication {
