@@ -16,8 +16,15 @@
 
 package org.springframework.cloud.stream.app.router.sink;
 
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.springframework.cloud.stream.test.matcher.MessageQueueMatcher.receivesPayloadThat;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,12 +39,6 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.springframework.cloud.stream.test.matcher.MessageQueueMatcher.receivesPayloadThat;
 
 /**
  * Tests for RouterSinkConfiguration.
@@ -184,29 +185,6 @@ public abstract class RouterSinkTests {
 
 	}
 
-	@TestPropertySource(properties = {
-			"router.script = classpath:/routertest-with-grab.groovy",
-			"router.variables = foo=baz",
-			"router.variablesLocation = classpath:/routertest.properties" })
-	public static class WithGroovyAndGrabTests extends RouterSinkTests {
-
-		@Test
-		public void test() throws Exception {
-			TestSupportBinder binder = (TestSupportBinder) this.binderFactory.getBinder(null, MessageChannel.class);
-			Message<?> message = MessageBuilder.withPayload("hello").setHeader("route", "foo").build();
-			this.channels.input().send(message);
-			MessageChannel baz = binder.getChannelForName("baz");
-			assertNotNull(baz);
-			assertThat(collector.forChannel(baz), receivesPayloadThat(is("hello")));
-
-			message = MessageBuilder.withPayload("world").setHeader("route", "bar").build();
-			this.channels.input().send(message);
-			MessageChannel qux = binder.getChannelForName("qux");
-			assertNotNull(qux);
-			assertThat(collector.forChannel(qux), receivesPayloadThat(is("world")));
-		}
-
-	}
 
 	// Avoid @SpringBootApplication with its @ComponentScan
 	@SpringBootApplication
