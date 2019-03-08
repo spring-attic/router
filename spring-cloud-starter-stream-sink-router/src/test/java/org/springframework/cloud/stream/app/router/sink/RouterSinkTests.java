@@ -67,7 +67,7 @@ public abstract class RouterSinkTests {
 	public static class DefaultRouterTests extends RouterSinkTests {
 
 		@Test
-		public void test() throws Exception {
+		public void test() {
 			TestSupportBinder binder = (TestSupportBinder) this.binderFactory.getBinder(null, MessageChannel.class);
 			Message<?> message = MessageBuilder.withPayload("hello").setHeader("routeTo", "baz").build();
 			this.channels.input().send(message);
@@ -82,6 +82,26 @@ public abstract class RouterSinkTests {
 			assertThat(collector.forChannel(qux), receivesPayloadThat(is("world")));
 		}
 
+	}
+
+	@TestPropertySource(properties = "router.resolutionRequired = true")
+	public static class DefaultRouterTestsWithByteArrayPayload extends RouterSinkTests {
+
+		@Test
+		public void test() {
+			TestSupportBinder binder = (TestSupportBinder) this.binderFactory.getBinder(null, MessageChannel.class);
+			Message<?> message = MessageBuilder.withPayload("hello".getBytes()).setHeader("routeTo", "baz").build();
+			this.channels.input().send(message);
+			MessageChannel baz = binder.getChannelForName("baz");
+			assertNotNull(baz);
+			assertThat(collector.forChannel(baz), receivesPayloadThat(is("hello")));
+
+			message = MessageBuilder.withPayload("world".getBytes()).setHeader("routeTo", "qux").build();
+			this.channels.input().send(message);
+			MessageChannel qux = binder.getChannelForName("qux");
+			assertNotNull(qux);
+			assertThat(collector.forChannel(qux), receivesPayloadThat(is("world")));
+		}
 	}
 
 	@TestPropertySource(properties = {
