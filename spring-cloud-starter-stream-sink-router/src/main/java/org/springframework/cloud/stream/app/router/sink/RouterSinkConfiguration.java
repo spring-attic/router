@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2016-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.binding.BinderAwareChannelResolver;
+import org.springframework.cloud.stream.config.BindingProperties;
 import org.springframework.cloud.stream.messaging.Sink;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -31,6 +32,9 @@ import org.springframework.integration.router.MessageRouter;
 import org.springframework.integration.router.MethodInvokingRouter;
 import org.springframework.integration.scripting.RefreshableResourceScriptSource;
 import org.springframework.integration.scripting.ScriptVariableGenerator;
+import org.springframework.integration.support.MutableMessage;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageHeaders;
 import org.springframework.scripting.ScriptSource;
 
 /**
@@ -39,6 +43,7 @@ import org.springframework.scripting.ScriptSource;
  * @author Gary Russell
  * @author Artem Bilan
  * @author Christian Tzolov
+ * @author Soby Chacko
  */
 @EnableBinding(Sink.class)
 @EnableConfigurationProperties(RouterSinkProperties.class)
@@ -54,7 +59,20 @@ public class RouterSinkConfiguration {
 			router = new MethodInvokingRouter(scriptProcessor(scriptVariableGenerator, properties));
 		}
 		else {
-			router = new ExpressionEvaluatingRouter(properties.getExpression());
+			router = new ExpressionEvaluatingRouter(properties.getExpression()) {
+				@Override
+				protected void handleMessageInternal(Message<?> message) {
+					if (message.getPayload() instanceof byte[]){
+						String contentType = message.getHeaders().containsKey(MessageHeaders.CONTENT_TYPE)
+								? message.getHeaders().get(MessageHeaders.CONTENT_TYPE).toString()
+								: BindingProperties.DEFAULT_CONTENT_TYPE.toString();
+						if (contentType.contains("text") || contentType.contains("json") || contentType.contains("x-spring-tuple")) {
+							message = new MutableMessage<>(new String(((byte[]) message.getPayload())), message.getHeaders());
+						}
+					}
+					super.handleMessageInternal(message);
+				}
+			};
 		}
 		router.setDefaultOutputChannelName(properties.getDefaultOutputChannel());
 		router.setResolutionRequired(properties.isResolutionRequired());

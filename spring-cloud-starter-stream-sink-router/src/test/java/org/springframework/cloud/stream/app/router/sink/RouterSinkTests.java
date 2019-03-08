@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2016-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  *
  * @author Gary Russell
  * @author Artem Bilan
+ * @author Soby Chacko
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
@@ -67,7 +68,7 @@ public abstract class RouterSinkTests {
 	public static class DefaultRouterTests extends RouterSinkTests {
 
 		@Test
-		public void test() throws Exception {
+		public void test() {
 			TestSupportBinder binder = (TestSupportBinder) this.binderFactory.getBinder(null, MessageChannel.class);
 			Message<?> message = MessageBuilder.withPayload("hello").setHeader("routeTo", "baz").build();
 			this.channels.input().send(message);
@@ -82,6 +83,26 @@ public abstract class RouterSinkTests {
 			assertThat(collector.forChannel(qux), receivesPayloadThat(is("world")));
 		}
 
+	}
+
+	@TestPropertySource(properties = "router.resolutionRequired = true")
+	public static class DefaultRouterTestsWithByteArrayPayload extends RouterSinkTests {
+
+		@Test
+		public void test() {
+			TestSupportBinder binder = (TestSupportBinder) this.binderFactory.getBinder(null, MessageChannel.class);
+			Message<?> message = MessageBuilder.withPayload("hello".getBytes()).setHeader("routeTo", "baz").build();
+			this.channels.input().send(message);
+			MessageChannel baz = binder.getChannelForName("baz");
+			assertNotNull(baz);
+			assertThat(collector.forChannel(baz), receivesPayloadThat(is("hello")));
+
+			message = MessageBuilder.withPayload("world".getBytes()).setHeader("routeTo", "qux").build();
+			this.channels.input().send(message);
+			MessageChannel qux = binder.getChannelForName("qux");
+			assertNotNull(qux);
+			assertThat(collector.forChannel(qux), receivesPayloadThat(is("world")));
+		}
 	}
 
 	@TestPropertySource(properties = {
